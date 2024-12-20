@@ -1,27 +1,25 @@
+# Database connection parameters
+DB_HOST = 'localhost'  # Change this to your DB host
+DB_NAME = 'db'  # Replace with your DB name
+DB_USER = 'user'  # Replace with your DB user
+DB_PASSWORD = 'pass'  # Replace with your DB password
+DB_PORT = 5432 # Replace with DB port
+
+# Do not edit anything below
+
 from flask import Flask
 import psycopg2
 from psycopg2 import sql
 
 app = Flask(__name__)
 
-# Database connection parameters
-DB_HOST = 'localhost'  # Change this to your DB host
-DB_NAME = 'your_db_name'  # Replace with your DB name
-DB_USER = 'your_db_user'  # Replace with your DB user
-DB_PASSWORD = 'your_db_password'  # Replace with your DB password
-
-# Route for "hello, world"
-@app.route('/')
-def hello():
-    return 'Hello, World!'
-
 # Route for querying the database
-@app.route('/db')
+@app.route('/')
 def db_query():
     try:
         # Establish the connection to the database
         conn = psycopg2.connect(
-            dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST
+            dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT
         )
         cursor = conn.cursor()
 
@@ -45,4 +43,4 @@ def db_query():
         return f"Error querying the database: {str(e)}"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

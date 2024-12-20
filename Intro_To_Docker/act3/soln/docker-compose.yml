@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:5000"
+  db:
+    image: "postgres:14"
+    environment:
+      - POSTGRES_PASSWORD=ACMCyber
+      - POSTGRES_USER=workshop
+    volumes:
+      - ./secret_init.sql:/docker-entrypoint-initdb.d/secret_init.sql:ro
+      - pg_data:/var/lib/postgresql/data
+
+    
+volumes:
+  pg_data:
