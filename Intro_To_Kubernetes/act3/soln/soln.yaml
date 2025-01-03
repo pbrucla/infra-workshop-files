@@ -32,27 +32,27 @@ spec:
         app.kubernetes.io/name: psql-db # This label is applied to pods created by this Deployment. This must match spec.selector.matchLabels.
     spec:
       containers:
-      - name: postgres # The container name doesn't matter for much but is still required.
-        image: postgres:14
-        ports:
-        - containerPort: 5432 # Any ports that you want to connect to, whether internally or externally, must be listed here.
-        volumeMounts:
-        - name: init
-          mountPath: "/docker-entrypoint-initdb.d"
-        env:
-        - name: POSTGRES_PASSWORD
-          value: ACMCyber
-        - name: POSTGRES_USER
-          value: workshop
-        - name: POSTGRES_DB
-          value: workshop
+        - name: postgres # The container name doesn't matter for much but is still required.
+          image: postgres:14
+          ports:
+            - containerPort: 5432 # Any ports that you want to connect to, whether internally or externally, must be listed here.
+          volumeMounts:
+            - name: init
+              mountPath: "/docker-entrypoint-initdb.d"
+          env:
+            - name: POSTGRES_PASSWORD
+              value: ACMCyber
+            - name: POSTGRES_USER
+              value: workshop
+            - name: POSTGRES_DB
+              value: workshop
       volumes:
-      - name: init # Must match name in volumeMount
-        configMap:
-          name: postgres-init # Name of configmap to mount
-          items:
-          - key: "init.sql" # Key of data you want in file from configmap
-            path: "init.sql" # Name of file inside of mountPath above above
+        - name: init # Must match name in volumeMount
+          configMap:
+            name: postgres-init # Name of configmap to mount
+            items:
+              - key: "init.sql" # Key of data you want in file from configmap
+                path: "init.sql" # Name of file inside of mountPath above above
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -70,19 +70,19 @@ spec:
         app.kubernetes.io/name: web-server # This label is applied to pods created by this Deployment. This must match spec.selector.matchLabels.
     spec:
       containers:
-      - name: web-server # The container name doesn't matter for much but is still required.
-        image: workshop.acmcyber.com/web-server:latest
-        ports:
-        - containerPort: 5000 # Any ports that you want to connect to, whether internally or externally, must be listed here.
-        env:
-        - name: DB_PASSWORD
-          value: ACMCyber
-        - name: DB_USER
-          value: workshop
-        - name: DB_NAME
-          value: workshop
-        - name: DB_HOST
-          value: db-service
+        - name: web-server # The container name doesn't matter for much but is still required.
+          image: workshop.acmcyber.com/web-server:latest
+          ports:
+            - containerPort: 5000 # Any ports that you want to connect to, whether internally or externally, must be listed here.
+          env:
+            - name: DB_PASSWORD
+              value: ACMCyber
+            - name: DB_USER
+              value: workshop
+            - name: DB_NAME
+              value: workshop
+            - name: DB_HOST
+              value: db-service
 ---
 apiVersion: v1
 kind: Service
@@ -113,3 +113,44 @@ spec:
     - protocol: TCP # Or UDP, but 99% of the time, you want TCP
       port: 5000 # This is the port inside of the container to expose.
       nodePort: 31337 # This is the port that you connect to if using a NodePort. This is ignored for ClusterIP services, and if left out, kubernetes will assign a random NodePort for you.
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-issuer
+  namespace: cert-manager # The cert-manager namespace is the default cluster-wide namespace.
+spec:
+  acme:
+    email: certbot@acmcyber.com # Put your email here, or certbot@acmcyber.com if you don’t want to use yours.
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-account-key # The name of the secret to store account credentials.
+    solvers:
+      - http01:
+          ingress:
+            class: traefik # The ingress controller you're using.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-server-ingress
+  namespace: myapp
+  annotations: # Annotations are like labels except they convey meaning instead of being used for matching.
+    cert-manager.io/cluster-issuer: letsencrypt-issuer # We have to annotate the name of the issuer we're using.
+spec:
+  ingressClassName: traefik # We're using traefik.
+  rules:
+    - host: 1337.k3.acmcyber.com # The subdomain you want to expose.
+      http:
+        paths:
+          - path: / # This will match all paths.
+            pathType: Prefix
+            backend:
+              service:
+                name: web-server-service # The name of the service you're exposing.
+                port:
+                  number: 5000 # The port that you want to expose.
+  tls: # HTTPS configuration
+    - hosts:
+        - 1337.k3.acmcyber.com # The list of hosts to provision a certificate for.
+      secretName: tls-web-server-ingress # The name of the secret to store the certificate in.
