@@ -1,8 +1,5 @@
 #!/bin/bash
 set -x
-kubectl get namespaces
-kubectl create namespace myapp
-kubectl get namespaces
 kubectl apply -f act_1_soln.yaml
 kubectl get deployments -n myapp
 sleep 10
