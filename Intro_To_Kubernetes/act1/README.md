@@ -24,7 +24,7 @@ Let's create a namespace! We can use the `kubectl create namespace <namespace>` 
 
 ## Part 2: Creating a ConfigMap
 
-If you remember from the Docker workshop, we had a `init.sql` file that we needed to mount into the container in a specific folder. In kubernetes, if you need to mount configuration files, we use the appropriately named `ConfigMap` Object! We specify as many key-value pairs as we want, and then specify in the Deployment where we want those key-value pairs to go: as a file, environment variable, etc. Since we didn't cover it very deeply, most of the ConfigMap framework is there - just fill in the blanks where comments tell you to.
+If you remember from the Docker workshop, we had a `init.sql` file that we needed to mount into the container in a specific folder. In kubernetes, if you need to mount configuration files, we use the appropriately named `ConfigMap` Object! We specify as many key-value pairs as we want, and then specify in the Deployment where we want those key-value pairs to go: as a file in a volume like we did before, environment variable, etc. Since we didn't cover it very deeply, most of the ConfigMap framework is there - just fill in the blanks where comments tell you to.
 
 More information about ConfigMaps (and the source of the ConfigMap example file) can be found at https://kubernetes.io/docs/concepts/configuration/configmap/.
 
@@ -54,6 +54,6 @@ Once deployed, use `kubectl get deployments` and `kubectl describe deployment/NA
 
 ## Part 5: Testing your deployment
 
-Let's test that the database is actually running! Run `psql -u USERNAME -d DATABASE_NAME -h 127.0.0.1` **inside the Pod** with `kubectl exec -it`. If successful, you should be able to run `\l` inside of the shell and see the database name listed, but not much is there quite yet.
+Let's test that the database is actually running! Run `psql -u USERNAME -d DATABASE_NAME -h 127.0.0.1` **inside the Pod** with `kubectl exec -it`. If successful, you should be able to run `select * from secrets;` inside of the psql shell and see some data. Type `\q` and hit enter to exit.
 
-In addition, we can also try connecting to the database ourselves by using `kubectl port-forward` to forward the port inside of the pod/container to our cloud shell, and then connect through this port-forward by running `psql -u USERNAME -d DATABASE_NAME -h 127.0.0.1` in cloud shell.
+In addition, we can also try connecting to the database ourselves by using `kubectl port-forward` to forward the port inside of the pod/container to our cloud shell, and then connect through this port-forward by running `psql -u USERNAME -d DATABASE_NAME -h 127.0.0.1` in cloud shell. Again, if successful, you should be able to run `select * from secrets;` inside of the psql shell and see some data. Type `\q` and hit enter to exit.
