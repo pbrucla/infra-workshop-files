@@ -16,11 +16,12 @@ data:
     INSERT INTO secrets (secret)
     VALUES ((SELECT version()));
 ---
+# Change this sample manifest from nginx to postgres!
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
-  namespace: nginx-namespace # You can specify a namespace in the manifest.
+  namespace: # Remember to put the namespace here!
 spec:
   replicas: 3
   selector:
@@ -32,18 +33,18 @@ spec:
         app.kubernetes.io/name: nginx # This label is applied to pods created by this Deployment. This must match spec.selector.matchLabels.
     spec:
       containers:
-      - name: nginx # The container name doesn't matter for much but is still required.
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80 # Any ports that you want to connect to, whether internally or externally, must be listed here.
-        volumeMounts:
-        - name: init
-          mountPath: "/docker-entrypoint-initdb.d"
+        - name: nginx # The container name doesn't matter for much but is still required.
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80 # Any ports that you want to connect to, whether internally or externally, must be listed here.
+          volumeMounts:
+            - name: init
+              mountPath: "/docker-entrypoint-initdb.d"
       # For postgres, we'll also need to specify env vars. Do a bit of research to figure out how to add this to the spec.
       volumes:
-      - name: init # Must match name in volumeMount
-        configMap:
-          name: postgres-init # Name of configmap to mount
-          items:
-          - key: "init.sql" # Key of data you want in file from configmap
-            path: "init.sql" # Name of file inside of mountPath above above
+        - name: init # Must match name in volumeMount
+          configMap:
+            name: postgres-init # Name of configmap to mount
+            items:
+              - key: "init.sql" # Key of data you want in file from configmap
+                path: "init.sql" # Name of file inside of mountPath above above

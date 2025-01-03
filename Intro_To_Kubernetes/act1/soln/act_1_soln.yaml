@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myapp
+---
 # ConfigMap: you can initialize a series of key-value pairs
 apiVersion: v1
 kind: ConfigMap
