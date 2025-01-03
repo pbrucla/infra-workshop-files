@@ -14,8 +14,8 @@ sleep 3
 psql -U workshop -d workshop -h 127.0.0.1 -c 'SELECT * from secrets;'
 
 # Extra testing
-kubectl exec -it deployment/db -n myapp -- psql -U workshop -d workshop -h 127.0.0.1 -c 'INSERT INTO secrets VALUES ('test');'
+kubectl exec -it deployment/db -n myapp -- psql -U workshop -d workshop -h 127.0.0.1 -c "INSERT INTO secrets VALUES ('test');"
 kubectl rollout restart -n myapp deployment/db
 sleep 10
-kubectl exec -it deployment/db -n myapp -- psql -U workshop -d workshop -h 127.0.0.1 -c 'INSERT INTO secrets VALUES ('test');'
+kubectl exec -it deployment/db -n myapp -- psql -U workshop -d workshop -h 127.0.0.1 -c "INSERT INTO secrets VALUES ('test');"
 kubectl delete -f act_1_soln.yaml
