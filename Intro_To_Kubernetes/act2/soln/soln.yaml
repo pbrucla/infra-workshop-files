@@ -1,0 +1,115 @@
+# ConfigMap: you can initialize a series of key-value pairs
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  namespace: myapp
+data:
+  init.sql: |
+    -- Create the table "secrets" with a single text column
+    CREATE TABLE secrets (
+        secret TEXT
+    );
+    -- Insert the string "cyber{postgres}" into the first entry
+    INSERT INTO secrets (secret) VALUES ('cyber{postgres}');
+    -- Insert the current version of PostgreSQL into the second entry
+    INSERT INTO secrets (secret)
+    VALUES ((SELECT version()));
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: myapp # You can specify a namespace in the manifest.
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: psql-db # This label describes which pods to manage. This must match spec.template.metadata.labels below.
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: psql-db # This label is applied to pods created by this Deployment. This must match spec.selector.matchLabels.
+    spec:
+      containers:
+      - name: postgres # The container name doesn't matter for much but is still required.
+        image: postgres:14
+        ports:
+        - containerPort: 5432 # Any ports that you want to connect to, whether internally or externally, must be listed here.
+        volumeMounts:
+        - name: init
+          mountPath: "/docker-entrypoint-initdb.d"
+        env:
+        - name: POSTGRES_PASSWORD
+          value: ACMCyber
+        - name: POSTGRES_USER
+          value: workshop
+        - name: POSTGRES_DB
+          value: workshop
+      volumes:
+      - name: init # Must match name in volumeMount
+        configMap:
+          name: postgres-init # Name of configmap to mount
+          items:
+          - key: "init.sql" # Key of data you want in file from configmap
+            path: "init.sql" # Name of file inside of mountPath above above
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+  namespace: myapp # You can specify a namespace in the manifest.
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web-server # This label describes which pods to manage. This must match spec.template.metadata.labels below.
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web-server # This label is applied to pods created by this Deployment. This must match spec.selector.matchLabels.
+    spec:
+      containers:
+      - name: web-server # The container name doesn't matter for much but is still required.
+        image: workshop.acmcyber.com/web-server
+        ports:
+        - containerPort: 5000 # Any ports that you want to connect to, whether internally or externally, must be listed here.
+        env:
+        - name: DB_PASSWORD
+          value: ACMCyber
+        - name: DB_USER
+          value: workshop
+        - name: DB_NAME
+          value: workshop
+        - name: DB_HOST
+          value: db-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: myapp
+spec:
+  #clusterIP: 10.96.0.10 # This is the IP to access the service if using a ClusterIP. This is ignored for NodePorts, and randomly assigned if left out (since you can just use dns to access instead).
+  type: ClusterIP # Or NodePort
+  selector:
+    app.kubernetes.io/name: psql-db # This must match the pod label from the deployment.
+  ports:
+    - protocol: TCP # Or UDP, but 99% of the time, you want TCP
+      port: 5432 # This is the port inside of the container to expose.
+      #targetPort: 31337 # This is the port that you connect to if using a NodePort. This is ignored for ClusterIP services, and if left out, kubernetes will assign a random NodePort for you.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-server-service
+  namespace: myapp
+spec:
+  #clusterIP: 10.96.0.10 # This is the IP to access the service if using a ClusterIP. This is ignored for NodePorts, and randomly assigned if left out (since you can just use dns to access instead).
+  type: NodePort # Or NodePort
+  selector:
+    app.kubernetes.io/name: web-server # This must match the pod label from the deployment.
+  ports:
+    - protocol: TCP # Or UDP, but 99% of the time, you want TCP
+      port: 5000 # This is the port inside of the container to expose.
+      nodePort: 31337 # This is the port that you connect to if using a NodePort. This is ignored for ClusterIP services, and if left out, kubernetes will assign a random NodePort for you.

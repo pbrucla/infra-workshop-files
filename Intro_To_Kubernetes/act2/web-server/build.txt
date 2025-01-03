@@ -1,0 +1,2 @@
+docker build . -t workshop.acmcyber.com/NAME_HERE
+docker push workshop.acmcyber.com/PUT_NAME_HERE
