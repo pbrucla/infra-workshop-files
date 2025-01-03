@@ -1,0 +1,48 @@
+# ConfigMap: you can initialize a series of key-value pairs
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  namespace: # Remember to put the namespace here!
+data:
+  init.sql: |
+    -- Create the table "secrets" with a single text column
+    CREATE TABLE secrets (
+        secret TEXT
+    );
+    -- Insert the string "cyber{postgres}" into the first entry
+    INSERT INTO secrets (secret) VALUES ('cyber{postgres}');
+    -- Insert the current version of PostgreSQL into the second entry
+    INSERT INTO secrets (secret)
+    VALUES ((SELECT version()));
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: nginx-namespace # You can specify a namespace in the manifest.
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx # This label describes which pods to manage. This must match spec.template.metadata.labels below.
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nginx # This label is applied to pods created by this Deployment. This must match spec.selector.matchLabels.
+    spec:
+      containers:
+      - name: nginx # The container name doesn't matter for much but is still required.
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80 # Any ports that you want to connect to, whether internally or externally, must be listed here.
+        volumeMounts:
+        - name: init
+          mountPath: "/docker-entrypoint-initdb.d"
+      volumes:
+      - name: init # Must match name in volumeMount
+        configMap:
+          name: postgres-init # Name of configmap to mount
+          items:
+          - key: "init.sql" # Key of data you want in file from configmap
+            path: "init.sql" # Name of file inside of mountPath above above
