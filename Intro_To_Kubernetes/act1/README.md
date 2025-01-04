@@ -7,7 +7,7 @@ Let's get started with your first deployment against a Kubernetes cluster!
 
 ## Part 0: Connecting to your cluster
 
-First, we need to authenticate to the cluster. Make sure you are on google cloud shell at https://shell.cloud.google.com, and then copy the **contents** of `k3s.yaml` to the file at `~/.kube/config`, creating it if it does not exist. You will then need to edit the line `server: https://127.0.0.1:6443` and replace `127.0.0.1` with your cluster's IP address, which we should have provided you by now.
+First, we need to authenticate to the cluster. Make sure you are on google cloud shell at https://shell.cloud.google.com, and then copy the **contents** of `k3s.yaml` to the file at `~/.kube/config`, creating it if it does not exist. You will then need to edit the line `server: https://127.0.0.1:6443` and replace `127.0.0.1` with your cluster's IP address, which we should have provided you by now. **Keep the port 6443.**
 
 Once done, try running `kubectl get namespaces`. If you connected successfully, you should see something like this:
 
