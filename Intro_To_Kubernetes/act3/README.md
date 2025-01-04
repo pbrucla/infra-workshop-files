@@ -39,7 +39,7 @@ Since we didn't really cover cluster issuers, the one at the top of `ingress-exa
 
 ## Part 2: Create the ingress
 
-You should've been assigned a domain that points to your cluster's IP. Edit the ingress in `ingress-example.yaml` to use this domain, and also set the correct service and port for the backend.
+You should've been assigned a domain that points to your cluster's IP. Edit the ingress in `ingress-example.yaml` to use this domain, and also set the correct service and port for the backend. You should also update the webserver's Service to be ClusterIP instead of NodePort, since the old port is no longer needed.
 
 ## Part 3: Testing
 

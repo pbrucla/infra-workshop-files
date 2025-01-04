@@ -106,13 +106,12 @@ metadata:
   namespace: myapp
 spec:
   #clusterIP: 10.96.0.10 # This is the IP to access the service if using a ClusterIP. This is ignored for NodePorts, and randomly assigned if left out (since you can just use dns to access instead).
-  type: NodePort # Or NodePort
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: web-server # This must match the pod label from the deployment.
   ports:
     - protocol: TCP # Or UDP, but 99% of the time, you want TCP
       port: 5000 # This is the port inside of the container to expose.
-      nodePort: 31337 # This is the port that you connect to if using a NodePort. This is ignored for ClusterIP services, and if left out, kubernetes will assign a random NodePort for you.
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer

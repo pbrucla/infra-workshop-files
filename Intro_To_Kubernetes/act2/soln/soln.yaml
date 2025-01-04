@@ -106,7 +106,7 @@ metadata:
   namespace: myapp
 spec:
   #clusterIP: 10.96.0.10 # This is the IP to access the service if using a ClusterIP. This is ignored for NodePorts, and randomly assigned if left out (since you can just use dns to access instead).
-  type: NodePort # Or NodePort
+  type: NodePort
   selector:
     app.kubernetes.io/name: web-server # This must match the pod label from the deployment.
   ports:
