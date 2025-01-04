@@ -5,6 +5,10 @@ Let's get started with your first deployment against a Kubernetes cluster!
 ## Potentially useful resources
 - https://kubespec.dev: Kubernetes .yaml file specification explorer
 
+## Part -1: Setting up the cluster
+
+If you don't already have a cluster, you'll have to set one up yourself. K3s has a simple installation guide [on their homepage](https://k3s.io), but note that it takes up a wide range of ports, so it's not recommended to install it directly on your machine. Instead, you'll want to provision either a cloud machine, or spin up a Linux VM to install it. If you set up your own k3s cluster, then don't use the `k3s.yaml` file in this repository. Instead, pull the file from `/etc/rancher/k3s/k3s.yaml` on the machine the cluster is on, and add the line `insecure-skip-tls-verify: true` after the `server:` line.
+
 ## Part 0: Connecting to your cluster
 
 First, we need to authenticate to the cluster. Make sure you are on google cloud shell at https://shell.cloud.google.com, and then copy the **contents** of `k3s.yaml` to the file at `~/.kube/config`, creating it if it does not exist. You will then need to edit the line `server: https://127.0.0.1:6443` and replace `127.0.0.1` with your cluster's IP address, which we should have provided you by now. **Keep the port 6443.**

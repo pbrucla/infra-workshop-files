@@ -4,13 +4,13 @@ In this activity, we will create a web server and allow it to access the databas
 
 ## Part 0: Build the web server
 
-Before we host a web server, we need to create the web server docker image first. A modified version of the same web server from before is available in the `web-server` folder - we've already built this container, available at `workshop.acmcyber.com/web-server`, but if you'd like to do it yourself, go ahead and build this container and push it to `workshop.acmcyber.com/YOUR_USERNAME` so we can use it in the cluster. Note: please make sure to build the container inside of cloud shell. If you build this locally on the wrong architecture (e.g. M1 Macs), it will not run in the cluster!
+Before we host a web server, we need to create the web server docker image first. A modified version of the same web server from before is available in the `web-server` folder - we've already built this container, available at `ghcr.io/pbrucla/infra-workshop-files/web-server`, but if you'd like to do it yourself, go ahead and build this container and push it to `workshop.acmcyber.com/YOUR_USERNAME` so we can use it in the cluster. Note: please make sure to build the container inside of cloud shell. If you build this locally on the wrong architecture (e.g. M1 Macs), it will not run in the cluster!
 
 The commands you need to build and run are available in `build.txt` if you forgot.
 
 ## Part 1: Create the web server deployment
 
-Pretty much the same as the previous activity, but create a deployment for the web server. Consider copying/using the same file from before but adding a new deployment by placing the object after 3 dashes, similarly to how the ConfigMap and Deployment are separated to keep everything in the same file. There are new environment variables to specify (see app.py for details), and use the image you pushed to `workshop.acmcyber.com` in your deployment. Here, let's make 3 replicas of the web server. Note that the web server runs on port 5000!
+Pretty much the same as the previous activity, but create a deployment for the web server. Consider copying/using the same file from before but adding a new deployment by placing the object after 3 dashes, similarly to how the ConfigMap and Deployment are separated to keep everything in the same file. There are new environment variables to specify (see app.py for details), and use the image you pushed to `workshop.acmcyber.com` (or the image already on ghcr) in your deployment. Here, let's make 3 replicas of the web server. Note that the web server runs on port 5000!
 
 ## Part 2: Create a service to access the database
 
