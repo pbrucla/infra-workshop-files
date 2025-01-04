@@ -59,7 +59,7 @@ Once deployed, use `kubectl get deployments` and `kubectl describe deployment/NA
 
 Let's test that the database is actually running! Run `psql -U USERNAME -d DATABASE_NAME -h 127.0.0.1` **inside the Pod** with `kubectl exec -it`. If successful, you should be able to run `select * from secrets;` inside of the psql shell and see some data. Type `\q` and hit enter to exit.
 
-In addition, we can also try connecting to the database ourselves by using `kubectl port-forward` to forward the port inside of the pod/container to our cloud shell, and then connect through this port-forward by running `psql -U USERNAME -d DATABASE_NAME -h 127.0.0.1` in cloud shell. Again, if successful, you should be able to run `select * from secrets;` inside of the psql shell and see some data. Type `\q` and hit enter to exit.
+In addition, we can also try connecting to the database ourselves by using `kubectl port-forward` to forward the port inside of the pod/container to our cloud shell, and then connect through this port-forward by running `psql -U USERNAME -d DATABASE_NAME -h 127.0.0.1` in cloud shell. Note that port-forward runs in the foreground while waiting for a connection to the port locally, so it will appear to hang, and you'll need to run psql in another tab. Again, if successful, you should be able to run `select * from secrets;` inside of the psql shell and see some data. Type `\q` and hit enter to exit.
 
 Notice how you are not prompted to enter your password: that is because for port forwarding with kubectl, it appears to the container that the traffic is coming from localhost, not from an external source.
 
