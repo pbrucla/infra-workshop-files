@@ -1,8 +1,8 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-name: letsencrypt-issuer
-namespace: cert-manager # The cert-manager namespace is the default cluster-wide namespace. Don't change it.
+  name: letsencrypt-issuer
+  namespace: cert-manager # The cert-manager namespace is the default cluster-wide namespace. Don't change it.
 spec:
   acme:
     email: user@example.com # Put your email here, or certbot@acmcyber.com if you don’t want to use yours.
